@@ -60,8 +60,12 @@ def RoomCode(request):
 
 def home(request):
     # match = Price.objects.all().order_by('-amount')
-    bal = get_withdrawable_balance(request.user.id)+get_deposit_balance(request.user.id)
-    return render(request, 'home.html', {'data':bal})
+    if request.user:
+      bal = get_withdrawable_balance(request.user.id)+get_deposit_balance(request.user.id)
+      return render(request, 'home.html', {'data':bal})
+    else:
+        return render(request, 'home.html', {'data':0})
+
 
 
 def ViewRoom(request):
