@@ -8,7 +8,7 @@ from .serializer import Payment_deposit_serializer , Payment_withdrawable_serial
 
 
 def wallet(request):
-    balance= get_deposit_balance(request.user)+get_withdrawable_balance(request.user)
+    balance= get_deposit_balance(request.user.id)+get_withdrawable_balance(request.user.id)
     print(balance)
     return render(request ,'wallet.html',{'bal':balance})
 
