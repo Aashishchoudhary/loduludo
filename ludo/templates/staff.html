@@ -42,7 +42,7 @@
       }
 
       function getData() {
-        fetch(`http://13.201.178.198/check-staff/`, {
+        fetch(`http://13.202.138.171/check-staff/`, {
           method: "GET",
 
           headers: {
@@ -67,7 +67,7 @@
           btn.id='btn'
           btn.textContent="view"
           function myfun(){
-            window.location.href=`http://13.201.178.198/check-match/?id=${item.id}`
+            window.location.href=`http://13.202.138.171/check-match/?id=${item.id}`
           }
           btn.addEventListener('click' ,myfun)
           card.appendChild(btn)

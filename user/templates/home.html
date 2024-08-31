@@ -200,7 +200,7 @@ request_price.forEach((item)=>{
     acceptbtn.textContent='Accept'
 
     function acceptFunction(id) {
-        fetch(`http://13.201.178.198/accept-reject/${id}/`, {
+        fetch(`http://13.202.138.171/accept-reject/${id}/`, {
             method: 'PATCH',
             headers: {
                 'Accept': 'application/json',
@@ -230,7 +230,7 @@ request_price.forEach((item)=>{
     rejectbtn.className='rejectbtn'
     rejectbtn.textContent='Reject'
     function rejectFunction(id) {
-        fetch(`http://13.201.178.198/accept-reject/${id}/`, {
+        fetch(`http://13.202.138.171/accept-reject/${id}/`, {
             method: 'PATCH',
             headers: {
                 'Accept': 'application/json',
@@ -291,7 +291,7 @@ requestConatiner.appendChild(card)
     
 
     function myFunction(id) {
-        fetch(`http://13.201.178.198/approval-request/${id}/`, {
+        fetch(`http://13.202.138.171/approval-request/${id}/`, {
             method: 'PATCH',
             headers: {
                 'Accept': 'application/json',

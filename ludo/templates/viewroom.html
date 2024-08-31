@@ -51,7 +51,7 @@
     };
     
     async function getData() {
-const url = `http://13.201.178.198/viewData/${id}/`
+const url = `http://13.202.138.171/viewData/${id}/`
 try {
 const response = await fetch(url);
 if (!response.ok) {
@@ -74,7 +74,7 @@ const btnsave= document.getElementById('win-save')
 imgfield.hidden=true
 btnsave.hidden = true
       async function getWin() {
-const url = `http://13.201.178.198/win/${id}/`
+const url = `http://13.202.138.171/win/${id}/`
 try {
 const response = await fetch(url);
 if (!response.ok) {
@@ -92,7 +92,7 @@ console.error(error.message);
 }
 getWin()
       async function getLoss() {
-const url = `http://13.201.178.198/loss/${id}/`
+const url = `http://13.202.138.171/loss/${id}/`
 try {
 const response = await fetch(url);
 
@@ -109,7 +109,7 @@ console.error(error.message)
 }
 }getLoss()
       async function getCancel() {
-const url = `http://13.201.178.198/cancel/${id}/`
+const url = `http://13.202.138.171/cancel/${id}/`
 try {
 const response = await fetch(url);
 if (!response.ok) {
@@ -172,7 +172,7 @@ async function  winDataFun (){
   const formData = new FormData();
   formData.append("img", img_upload , img_upload.name);
 
-  fetch(`http://13.201.178.198/win/${id}/`, {
+  fetch(`http://13.202.138.171/win/${id}/`, {
             method: 'POST',
             body: formData,
             headers: {
@@ -199,7 +199,7 @@ btnsave.addEventListener('click' ,winDataFun)
 
 
 function canceData (){
-  fetch(`http://13.201.178.198/cancel/${id}/`,{
+  fetch(`http://13.202.138.171/cancel/${id}/`,{
    method:'POST',
     headers :{
       'X-CSRFToken': getCookie("csrftoken")
@@ -221,7 +221,7 @@ location.reload()
 cancelbtn.addEventListener('click' , canceData)
 
 function lossData(){
-  fetch(`http://13.201.178.198/loss/${id}/` ,{
+  fetch(`http://13.202.138.171/loss/${id}/` ,{
 method:"POST",
 headers :{
   'X-CSRFToken': getCookie("csrftoken")
