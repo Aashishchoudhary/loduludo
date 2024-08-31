@@ -60,7 +60,7 @@ def RoomCode(request):
 
 def home(request):
     # match = Price.objects.all().order_by('-amount')
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
     # Handle unauthenticated users
        data = None  # Set data to None for unauthenticated users
     else:
