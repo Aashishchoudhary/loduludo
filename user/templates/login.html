@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet" href="{% static 'login.css' %}">
+    </head>
+
+<body>
+
+    <h1 class="login">Login</h1>
+    <form class="form" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn" type="submit"></input>
+        
+        
+        <a class="link" href="{% url 'signup' %}">Dont have Account Create</a>
+    </form>
+    {% if form.errors %}
+        <ul class="errors">
+            {% for error in form.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

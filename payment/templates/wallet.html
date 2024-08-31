@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+</head>
+<body>
+    {% if request.user.is_authenticated %}
+    <div><p class="amount">{{bal}} Rs</p>
+    <p class="deposit">Deposit</p>
+<p class="withdrawal">Withdrawal</p></div>
+{% else %}
+<a href="{% url 'login' %}">Login</a>
+<a href="{% url 'signup' %}">Signup</a>
+{% endif %}
+</body>
+</html>

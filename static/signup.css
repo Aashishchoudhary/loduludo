@@ -1,0 +1,58 @@
+/* Basic styles for form elements */
+body {
+    text-align: center;
+  
+}
+form {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 300px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #b4afaf;
+  }
+  
+  label {
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #635f5f;
+    border-radius: 3px;
+    margin-bottom: 15px;
+  }
+  
+ .btn {
+    color: rgb(212, 204, 204);
+    padding: 12px 20px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    
+    background-color: rgb(56, 13, 227);
+    width: 50%;
+    margin-left: 25%;
+  }
+  
+  
+  
+  /* Additional styles for specific fields (optional) */
+  .error {
+    border-color: red;
+  }
+  .helptext ,ul {
+    display: none;
+  }
+  .errorlist {
+    display: inline;
+    background: #ef0909;
+    color: black;
+
+  }

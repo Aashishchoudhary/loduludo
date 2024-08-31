@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Satff</title>
+    <style>
+        body{
+            align-items: center;
+        }
+        .card{
+            border: 1px solid rgb(28, 160, 226);
+            margin: 5px;
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: auto auto;
+            padding: 5px;
+        }
+        #btn{
+          width: 50px;
+          height: 40px;
+          background: #656ad3;
+          color: rgb(255, 255, 255);
+          border-radius: 5px;
+        }
+    </style>
+  </head>
+  <body>
+    {% if request.user.is_staff %}
+    <h2>Data</h2>
+    <div id="data-container"></div>
+
+    {% else %}
+    <p>You Dont have permission to access this page</p>
+    {% endif %}
+    <script>
+      // get cookiew function
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+
+      function getData() {
+        fetch(`http://13.201.178.198/check-staff/`, {
+          method: "GET",
+
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            const dataContainer = document.getElementById("data-container");
+            dataContainer.innerHTML = "";
+            data.forEach((item) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.innerHTML = `
+            <p class='para'>Amount-${item.amount}</p>
+            <p class='para'>Closed-${item.closed}</p>
+            
+            `;
+          const btn = document.createElement('button')
+          btn.id='btn'
+          btn.textContent="view"
+          function myfun(){
+            window.location.href=`http://13.201.178.198/check-match/?id=${item.id}`
+          }
+          btn.addEventListener('click' ,myfun)
+          card.appendChild(btn)
+              dataContainer.appendChild(card);
+            });
+          })
+          .catch((error) => {
+            console.error(
+              "There was a problem with the fetch operation:",
+              error
+            );
+          });
+      }
+      getData();
+    </script>
+  </body>
+</html>

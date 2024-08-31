@@ -1,0 +1,393 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}" />
+
+   
+   <style>
+    /* Styling the card container */
+.card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Flex container for the content */
+.card-content {
+    display: flex;
+    justify-content: space-between; /* Aligns the info and button on opposite sides */
+    align-items: center; /* Vertically center-aligns the content */
+}
+
+/* Amount and winning amount styling */
+.card-content .info {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-content .info .amount,
+.card-content .info .winning-amount {
+    font-size: 18px;
+    color: #333;
+    margin: 5px 0;
+    font-weight: 500;
+}
+
+/* Button container */
+.btn-class {
+    margin-left: 20px;
+}
+.rejectbtn{
+  margin: 2px;
+}
+
+/* Button styling */
+#btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#btn:hover {
+    background-color: #0056b3;
+}
+
+   </style>
+  </head>
+
+  <body>
+    {% if request.user.is_authenticated %}
+
+    <div class="grid">
+      <p class="username">{{ request.user.username }}</p>
+      <a class="match" href="{% url 'setamount' %}">Set Match</a>
+      <a href="{% url 'wallet' %}">Wallet - {{data}}</a>
+    </div>
+    <br>
+  <div id="waiting-container"></div>
+  <div id="request-container"></div>
+  <div id="accept-to-play"></div>
+<div id="my_price"></div>
+    <div id="data-container"></div>
+  
+    <br>
+ 
+    <br>
+    <div id="user-data-container"></div>
+    <br>
+    <div id="user-price-data-container"></div>
+
+
+    <br />
+    <!-- <a href="{% url 'logout' %}">Logout</a> -->
+    {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'signup' %}">Signup</a>
+    {% endif %}
+    <script>
+      function joinChatRoom() {
+       
+
+        socket = new WebSocket(
+          "ws://" + window.location.host + "/ws/chat/" + "home" + "/"
+        );
+        socket.onopen = function (e) {
+          console.log("Connection established");
+          socket.send(JSON.stringify({ command: "fetch_data" }));
+        };
+        setInterval(()=>{socket.send(JSON.stringify({ command: "fetch_data" }));},500)
+        socket.onmessage = function (event) {
+          const data = JSON.parse(event.data).data;
+          const username = JSON.parse(event.data).username;
+          const price_waiting = JSON.parse(event.data).price_waiting;
+          console.log(price_waiting)
+         
+          
+         const user_price_data=JSON.parse(event.data).user_price
+         const request_price=JSON.parse(event.data).request_price
+         const accept_to_play=JSON.parse(event.data).accept_to_play
+   const my_data = JSON.parse(event.data).my_data
+         const price_cut = JSON.parse(event.data).price.map(
+            (item) => item.cut
+          );
+       
+          // my price data 
+const my_price = document.getElementById('my_price')
+my_price.innerHTML=''
+
+my_data.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const cardLink = document.createElement("div");
+    cardLink.className = "card-link"; // Optional: Add a class for styling
+
+    cardLink.innerHTML = `
+        <div class='card-header'> <p class='amount'>Amount: ${item.amount}</p><p class='winning-amount'> Winning amount: ${Math.round((item.amount * price_cut) / 100)}</p></div>
+       
+    `;
+
+    const btn = document.createElement('button');
+    btn.id='btn'
+    btn.textContent='view'
+    cardLink.append(btn)
+   
+    
+
+    function myFunction(id) {
+       window.location.href=`/room/?id=${item.id}&user=${username}`
+    }
+
+    btn.addEventListener('click', () => { myFunction(item.id); });
+
+    card.appendChild(cardLink);
+    my_price.appendChild(card);
+});
+// price waiting
+
+const waitingConatiner = document.getElementById('waiting-container')
+waitingConatiner.innerHTML=''
+
+price_waiting.forEach((item)=>{
+  const card = document.createElement("div");
+    card.className = "card";
+
+    const cardPara=document.createElement('div')
+    cardPara.className='card-link'
+
+    cardPara.innerHTML = `
+        <div class='card-header'> <p class='amount'>Amount: ${item.amount}</p><p class='winning-amount'> Winning amount: ${Math.round((item.amount * price_cut) / 100)}</p></div>
+        <div><button>Waiting....</button></div>    
+    `;
+    card.appendChild(cardPara);
+    waitingConatiner.appendChild(card);
+
+})
+
+
+// request Price
+const  requestConatiner= document.getElementById('request-container')
+requestConatiner.innerHTML=''
+
+request_price.forEach((item)=>{
+
+  const card = document.createElement("div");
+    card.className = "card";
+
+    const cardPara=document.createElement('div')
+    cardPara.className='card-link'
+
+    cardPara.innerHTML = `<div class='card-header'> <p class='amount'>Amount: ${item.amount}</p><p class='winning-amount'> Winning amount: ${Math.round((item.amount * price_cut) / 100)}</p></div>`
+
+    const acceptbtn= document.createElement('button')
+    acceptbtn.className='acceptbtn'
+    acceptbtn.textContent='Accept'
+
+    function acceptFunction(id) {
+        fetch(`http://13.201.178.198/accept-reject/${id}/`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie("csrftoken")
+            },body: JSON.stringify({ accetp_to_play: true })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+        // window.location.href=`/room/?id=${item.id}&user=${username}`
+    }
+
+    acceptbtn.addEventListener('click', () => { acceptFunction(item.id); });
+
+
+    const rejectbtn= document.createElement('button')
+    rejectbtn.className='rejectbtn'
+    rejectbtn.textContent='Reject'
+    function rejectFunction(id) {
+        fetch(`http://13.201.178.198/accept-reject/${id}/`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie("csrftoken")
+            },body: JSON.stringify({ rejected: true })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    rejectbtn.addEventListener('click', () => { rejectFunction(item.id); });
+
+    const btnDiv= document.createElement('div')
+btnDiv.appendChild(acceptbtn)
+btnDiv.appendChild(rejectbtn)
+card.appendChild(cardPara)
+card.appendChild(btnDiv)
+requestConatiner.appendChild(card)
+})
+
+
+
+
+
+// main data
+
+          const dataContainer = document.getElementById("data-container");
+          dataContainer.innerHTML = "";
+
+          data.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const cardLink = document.createElement("div");
+    cardLink.className = "card-link"; // Optional: Add a class for styling
+
+    cardLink.innerHTML = `
+        <div class='card-header'> <p class='amount'>Amount: ${item.amount}</p><p class='winning-amount'> Winning amount: ${Math.round((item.amount * price_cut) / 100)}</p></div>
+       
+    `;
+
+    const btn = document.createElement('button');
+    btn.id='btn'
+    btn.textContent='Request'
+    cardLink.append(btn)
+   
+    
+
+    function myFunction(id) {
+        fetch(`http://13.201.178.198/approval-request/${id}/`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie("csrftoken")
+            }
+        })
+        
+        .then(data => {
+          
+            if(data.status==409){
+              alert("Please add Payment First")
+            }
+            console.log(data)
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    btn.addEventListener('click', () => { myFunction(item.id); });
+
+    card.appendChild(cardLink);
+    dataContainer.appendChild(card);
+});
+
+
+// accept_to_play
+
+const accept_to_paly_container = document.getElementById('accept-to-play')
+accept_to_paly_container.innerHTML=''
+
+accept_to_play.forEach((item)=>{
+  const card = document.createElement("div");
+    card.className = "card";
+
+    const cardLink = document.createElement("div");
+    cardLink.className = "card-link"; // Optional: Add a class for styling
+
+    cardLink.innerHTML = `
+        <div class='card-header'> <p class='amount'>Amount: ${item.amount}</p><p class='winning-amount'> Winning amount: ${Math.round((item.amount * price_cut) / 100)}</p></div>
+       
+    `;
+
+    const btn = document.createElement('button');
+    btn.id='btn'
+    console.log('hsdjsad',typeof(item.accetp_to_play))
+    if(item.accetp_to_play){
+console.log('something')
+      btn.textContent='Play'
+    }
+    else if(item.rejected){
+     
+      btn.textContent='Rejected'
+    }
+    else if(!item.rejected&&!item.accetp_to_play){
+    
+      btn.textContent='Wait...'
+    }
+    
+    cardLink.append(btn)
+
+    function myFunction(){window.location.href=`/viewroom/?id=${item.id}&user=${username}`}
+    if(item.accetp_to_play){btn.addEventListener('click', myFunction);}
+
+card.appendChild(cardLink);
+dataContainer.appendChild(card);
+    
+})
+
+
+      }
+        socket.onclose = function (event) {
+          if (event.wasClean) {
+            console.log(
+              `Connection closed cleanly, code=${event.code}, reason=${event.reason}`
+            );
+          } else {
+            console.log("Connection died");
+          }
+        };
+
+        socket.onerror = function (error) {
+          console.log(`Error: ${error.message}`);
+        };
+      }
+      // setInterval(joinChatRoom(),200)
+      joinChatRoom();
+           
+           function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+          console.log(getCookie("csrftoken"))
+          
+    </script>
+  </body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Code</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+</head>
+<body>
+ 
+    
+    <h1>Room</h1>
+    <p id="para_code"></p>
+    <button id="win">Win</button>
+    <input type="file" id="img">
+    <button id="win-save">update result</button>
+    <button id="loss">Loss</button>
+    <button id="cancel">Cancel</button>
+    <p id="result"></p>
+   
+<script>
+        
+  let params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  console.log(params);
+    const  socket =
+      new  WebSocket("ws://" + window.location.host + "/ws/message/" + id + "/");
+
+    socket.onopen = function (e) {
+      console.log("Connection established");
+      
+    };
+    
+    socket.onmessage = function (event) {
+        const data = JSON.parse(e.data);
+        
+       
+    };
+    socket.onclose = function (event) {
+      if (event.wasClean) {
+        console.log(
+          `Connection closed cleanly, code=${event.code}, reason=${event.reason}`
+        );
+      } else {
+        console.log("Connection died");
+      }
+    };
+
+    socket.onerror = function (error) {
+      console.log(`Error: ${error.message}`);
+    };
+    
+    async function getData() {
+const url = `http://13.201.178.198/viewData/${id}/`
+try {
+const response = await fetch(url);
+if (!response.ok) {
+  throw new Error(`Response status: ${response.status}`);
+}
+const json = await response.json();
+console.log(json);
+document.getElementById('para_code').innerHTML=json
+} catch (error) {
+console.error(error.message);
+}
+}getData()
+  
+const winbtn= document.getElementById('win')
+const lossbtn= document.getElementById('loss')
+const cancelbtn= document.getElementById('cancel')
+const result = document.getElementById('result')
+const imgfield=document.getElementById('img')
+const btnsave= document.getElementById('win-save')
+imgfield.hidden=true
+btnsave.hidden = true
+      async function getWin() {
+const url = `http://13.201.178.198/win/${id}/`
+try {
+const response = await fetch(url);
+if (!response.ok) {
+  throw new Error(`Response status: ${response.status}`);
+}
+if(response.status==200){
+winbtn.disabled=true
+lossbtn.disabled=true
+cancelbtn.disabled=true
+result.innerHTML= 'You have already submitted result for Win'}
+
+} catch (error) {
+console.error(error.message);
+}
+}
+getWin()
+      async function getLoss() {
+const url = `http://13.201.178.198/loss/${id}/`
+try {
+const response = await fetch(url);
+
+if(response.status==200){
+
+  winbtn.disabled=true
+  lossbtn.disabled=true
+  cancelbtn.disabled=true
+  result.innerHTML= 'You already submitted result for loss'
+}
+
+} catch (error) {
+console.error(error.message)
+}
+}getLoss()
+      async function getCancel() {
+const url = `http://13.201.178.198/cancel/${id}/`
+try {
+const response = await fetch(url);
+if (!response.ok) {
+  throw new Error(`Response status: ${response.status}`);
+}
+if(response.status==200){
+console.log(response)
+winbtn.disabled=true
+lossbtn.disabled=true
+cancelbtn.disabled=true
+result.innerHTML= 'You have already submitted result for cancel'}
+} catch (error) {
+console.error(error.message);
+}
+}
+getCancel()
+
+// get cokkie
+ 
+function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+// on win button click
+
+winbtn.addEventListener('click' , ()=>{btnsave.hidden=false , imgfield.hidden=false})
+
+// image compression
+async function handleImageUpload(event) {
+
+const imageFile = event;
+
+
+const options = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true,
+
+  mediaType: 'photo',
+  quality: 0.20,
+};
+try {
+  const compressedFile = await imageCompression(imageFile, options);
+  // console.log('ddddd',event , compressedFile)
+  // console.log('compressedFile instanceof Blob', compressedFile instanceof Blob); // true
+  // console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB` ,event ,compressedFile); // smaller than maxSizeMB
+   return  compressedFile
+  // write your own logic
+} catch (error) {
+  console.log(error);
+}
+}
+// win logic
+
+async function  winDataFun (){
+  const img_upload=await handleImageUpload(imgfield.files[0]||null)
+  console.log('data' , img_upload , img_upload.name)
+  const formData = new FormData();
+  formData.append("img", img_upload , img_upload.name);
+
+  fetch(`http://13.201.178.198/win/${id}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie("csrftoken")
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+          
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+        location.reload()
+}
+btnsave.addEventListener('click' ,winDataFun)
+
+// cancel button 
+
+
+function canceData (){
+  fetch(`http://13.201.178.198/cancel/${id}/`,{
+   method:'POST',
+    headers :{
+      'X-CSRFToken': getCookie("csrftoken")
+    }
+  }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+          
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+location.reload()
+}
+cancelbtn.addEventListener('click' , canceData)
+
+function lossData(){
+  fetch(`http://13.201.178.198/loss/${id}/` ,{
+method:"POST",
+headers :{
+  'X-CSRFToken': getCookie("csrftoken")
+}
+  }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+          
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+        location.reload()
+}
+lossbtn.addEventListener('click' , lossData)
+
+</script>
+</body>
+</html>
