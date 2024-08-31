@@ -60,7 +60,7 @@ def RoomCode(request):
 
 def home(request):
     # match = Price.objects.all().order_by('-amount')
-    if request.user:
+    if not request.user.is_authenticated():
       bal = get_withdrawable_balance(request.user.id)+get_deposit_balance(request.user.id)
       return render(request, 'home.html', {'data':bal})
     else:
