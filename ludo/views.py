@@ -61,10 +61,15 @@ def RoomCode(request):
 def home(request):
     # match = Price.objects.all().order_by('-amount')
     if not request.user.is_authenticated():
-      bal = get_withdrawable_balance(request.user.id)+get_deposit_balance(request.user.id)
-      return render(request, 'home.html', {'data':bal})
+    # Handle unauthenticated users
+       data = None  # Set data to None for unauthenticated users
     else:
-        return render(request, 'home.html', {'data':0})
+    # Handle authenticated users
+       user_id = request.user.id
+       bal = get_withdrawable_balance(user_id) + get_deposit_balance(user_id)
+       data = bal
+
+    return render(request, 'home.html', {'data': data})
 
 
 
